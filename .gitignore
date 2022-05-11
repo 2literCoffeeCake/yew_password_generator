@@ -1,0 +1,4 @@
+/target
+/Cargo.lock
+/www/yew_password_generator_bg.wasm
+/www/yew_password_generator.js
