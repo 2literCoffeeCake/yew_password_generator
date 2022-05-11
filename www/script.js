@@ -1,4 +1,4 @@
-import { enable_components, default as init } from './yew_password_generator.js';
+import { default as init } from './yew_password_generator.js';
 
 async function load_wasm() {
     try {
@@ -11,5 +11,5 @@ async function load_wasm() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    load_wasm().then(enable_components);
+    load_wasm();
 });

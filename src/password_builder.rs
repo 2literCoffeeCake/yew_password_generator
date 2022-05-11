@@ -1,11 +1,16 @@
+
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rand::Rng;
 
+#[allow(dead_code)]
 const LETTERS: &str = "abcdefghijklmnopqrstuvwxyz";
+#[allow(dead_code)]
 const NUMBERS: &str = "0123456789";
+#[allow(dead_code)]
 const SPECIALCHARS: &str = "!§$%&/()=?{[]}+*~#-_,;.:<>|";
 
+#[allow(dead_code)]
 pub fn generate_random_password(options: &PasswordOptions) -> String {
     let mut result: Vec<char> = Vec::new();
     if options.is_empty() {
@@ -66,6 +71,7 @@ pub struct PasswordOptions {
 }
 
 impl PasswordOptions {
+    #[allow(dead_code)]
     pub fn new(options: u8, mut lenght: usize) -> Self {
         let options = u8_to_array(options);
         if lenght < 4 {
