@@ -1,16 +1,11 @@
-
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rand::Rng;
 
-#[allow(dead_code)]
 const LETTERS: &str = "abcdefghijklmnopqrstuvwxyz";
-#[allow(dead_code)]
 const NUMBERS: &str = "0123456789";
-#[allow(dead_code)]
 const SPECIALCHARS: &str = "!§$%&/()=?{[]}+*~#-_,;.:<>|";
 
-#[allow(dead_code)]
 pub fn generate_random_password(options: &PasswordOptions) -> String {
     let mut result: Vec<char> = Vec::new();
     if options.is_empty() {
@@ -22,28 +17,28 @@ pub fn generate_random_password(options: &PasswordOptions) -> String {
     let mut char: char;
     let mut index;
 
-    if options.upper_case {
+    if options.use_upper_case {
         index = rand::thread_rng().gen_range(0..(LETTERS.len() - 1));
         char = LETTERS.to_uppercase().chars().nth(index).unwrap();
         chars.push_str(&LETTERS.to_uppercase());
         result.push(char);
     }
 
-    if options.lower_case {
+    if options.use_lower_case {
         index = rand::thread_rng().gen_range(0..(LETTERS.len() - 1));
         char = LETTERS.chars().nth(index).unwrap();
         chars.push_str(LETTERS);
         result.push(char);
     }
 
-    if options.numeric {
+    if options.use_numeric {
         index = rand::thread_rng().gen_range(0..(NUMBERS.len() - 1));
         char = NUMBERS.chars().nth(index).unwrap();
         chars.push_str(NUMBERS);
         result.push(char);
     }
 
-    if options.special {
+    if options.use_special {
         index = rand::thread_rng().gen_range(0..(SPECIALCHARS.len() - 1));
         char = SPECIALCHARS.chars().nth(index).unwrap();
         chars.push_str(SPECIALCHARS);
@@ -63,77 +58,72 @@ pub fn generate_random_password(options: &PasswordOptions) -> String {
     result.iter().collect()
 }
 pub struct PasswordOptions {
-    upper_case: bool,
-    lower_case: bool,
-    numeric: bool,
-    special: bool,
+    use_upper_case: bool,
+    use_lower_case: bool,
+    use_numeric: bool,
+    use_special: bool,
     lenght: usize,
 }
 
 impl PasswordOptions {
-    #[allow(dead_code)]
-    pub fn new(options: u8, mut lenght: usize) -> Self {
-        let options = u8_to_array(options);
-        if lenght < 4 {
-            lenght = 4;
-        }
-        Self {
-            lenght,
-            upper_case: options[0],
-            lower_case: options[1],
-            numeric: options[2],
-            special: options[3],
+    pub fn new() -> PasswordOptionsBuilder {
+        PasswordOptionsBuilder {
+            use_upper_case: None,
+            use_lower_case: None,
+            use_numeric: None,
+            use_special: None,
+            lenght: None,
         }
     }
 
     fn is_empty(&self) -> bool {
-        !self.upper_case && !self.lower_case && !self.numeric && !self.special
+        !self.use_upper_case && !self.use_lower_case && !self.use_numeric && !self.use_special
     }
 }
 
-fn u8_to_array(mut value: u8) -> [bool; 4] {
-    let mut result: [bool; 4] = [false; 4];
-    let mut index = 0;
-    if value > 15 {
-        value = 15;
-    }
-    loop {
-        if value == 0 {
-            break;
-        }
-        if (value % 2) == 1 {
-            result[index] = true;
-        }
-        index += 1;
-        value /= 2;
-    }
-    result.reverse();
-    result
+pub struct PasswordOptionsBuilder {
+    use_upper_case: Option<bool>,
+    use_lower_case: Option<bool>,
+    use_numeric: Option<bool>,
+    use_special: Option<bool>,
+    lenght: Option<usize>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    macro_rules! try_parse_u8 {
-        ($($name:ident: $value:expr,)*) => {
-        $(
-            #[test]
-            fn $name() {
-                let (input, expected) = $value;
-                let arr = u8_to_array(input);
-                assert_eq!(arr, expected);
-            }
-        )*
-        }
+impl PasswordOptionsBuilder{
+    pub fn use_upper_case(&mut self, flag: bool) -> &mut Self{
+        self.use_upper_case = Some(flag);
+        self
     }
 
-    try_parse_u8! {
-        parse_0_to_array: (0, [false, false, false, false]),
-        parse_6_to_array: (6, [false, true, true, false]),
-        parse_9_to_array: (9, [true, false, false, true]),
-        parse_11_to_array: (11, [true, false, true, true]),
-        parse_15_to_array: (15, [true, true, true, true]),
-        parse_20_to_array: (20, [true, true, true, true]),
+    pub fn use_lower_case(&mut self, flag: bool) -> &mut Self{
+        self.use_lower_case = Some(flag);
+        self
+    }
+
+    pub fn use_numeric(&mut self, flag: bool) -> &mut Self{
+        self.use_numeric = Some(flag);
+        self
+    }
+
+    pub fn use_special(&mut self, flag: bool) -> &mut Self{
+        self.use_special = Some(flag);
+        self
+    }
+
+    pub fn lenght(&mut self, lenght: usize) -> &mut Self{
+        if lenght >= 4{
+            self.lenght = Some(lenght);
+        }
+        self
+    }
+
+    pub fn build(&mut self) -> PasswordOptions{
+        PasswordOptions{
+            use_upper_case: self.use_upper_case.unwrap_or(true),
+            use_lower_case: self.use_lower_case.unwrap_or(true),
+            use_numeric: self.use_numeric.unwrap_or(true),
+            use_special: self.use_special.unwrap_or(true),
+            lenght: self.lenght.unwrap_or(8)
+        }
     }
 }
