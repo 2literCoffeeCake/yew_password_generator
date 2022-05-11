@@ -7,23 +7,22 @@ pub struct CheckBoxProps {
     pub label: String,
     pub row: u8,
     pub checked: bool,
-    pub on_change: Callback<(bool, u8)>,
-    pub value: u8
+    pub on_change: Callback<bool>,
 }
 
-fn get_value_from_input_event(e: InputEvent, value: u8) -> (bool, u8) {
+fn get_value_from_input_event(e: InputEvent) -> bool {
     let event: Event = e.dyn_into().unwrap_throw();
     let event_target = event.target().unwrap_throw();
     let target: HtmlInputElement = event_target.dyn_into().unwrap_throw();
-    (target.checked(), value)
+    target.checked()
 }
 
 #[function_component(CheckBox)]
 pub fn render_check_box(props: &CheckBoxProps) -> Html {
-    let CheckBoxProps { label, row, checked, on_change, value } = props.clone();
+    let CheckBoxProps { label, row, checked, on_change } = props.clone();
 
     let oninput = Callback::from(move |input_event: InputEvent| {
-        on_change.emit(get_value_from_input_event(input_event, value));
+        on_change.emit(get_value_from_input_event(input_event));
     });
 
     let style_1 = format!("grid-column: 2/3; grid-row: {}/{};", row, row + 1);
