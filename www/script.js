@@ -10,6 +10,4 @@ async function load_wasm() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    load_wasm();
-});
+document.addEventListener("DOMContentLoaded", load_wasm);

@@ -1,11 +1,12 @@
 use yew::{html, Component, Context, Html};
 
-use super::check_box::CheckBox;
+use super::{CheckBox, NumericTextBoxBox};
 pub enum Msg {
     OnUpperChange(bool),
     OnLowerChange(bool),
     OnNumericChange(bool),
     OnSpecialChange(bool),
+    OnLenghtChange(f64)
 }
 
 #[derive(Debug, Default)]
@@ -14,6 +15,7 @@ pub struct App{
     use_lower: bool,
     use_numeric: bool,
     use_special: bool,
+    lenght: u16
 }
 
 impl Component for App {
@@ -25,7 +27,8 @@ impl Component for App {
             use_lower: true,
             use_numeric: true,
             use_special: true,
-            use_upper: true
+            use_upper: true,
+            lenght: 8
         }
     }
 
@@ -35,6 +38,13 @@ impl Component for App {
             Msg::OnLowerChange(checked) => self.use_lower = checked,
             Msg::OnNumericChange(checked) => self.use_numeric = checked,
             Msg::OnSpecialChange(checked) => self.use_special = checked,
+            Msg::OnLenghtChange(mut lenght) => {
+                lenght = lenght.floor();
+                if lenght < 4.0{
+                    lenght = 4.0;
+                }
+                self.lenght = lenght as u16;
+            },
         };
         true
     }
@@ -44,6 +54,9 @@ impl Component for App {
         let on_lower_change = ctx.link().callback(Msg::OnLowerChange);
         let on_numeric_change = ctx.link().callback(Msg::OnNumericChange);
         let on_special_change = ctx.link().callback(Msg::OnSpecialChange);
+
+        let on_lenght_change= ctx.link().callback(Msg::OnLenghtChange);
+
         html! {
             <div class="layout">
                 <div style="grid-column: 2/4; grid-row: 2/3;">
@@ -53,6 +66,7 @@ impl Component for App {
                 <CheckBox on_change={on_lower_change} checked={self.use_lower} row={4} label={"Use lower case letters".to_owned()}/>
                 <CheckBox on_change={on_numeric_change} checked={self.use_numeric} row={5} label={"Use numeric".to_owned()}/>
                 <CheckBox on_change={on_special_change} checked={self.use_special} row={6} label={"Use special".to_owned()}/>
+                <NumericTextBoxBox on_change={on_lenght_change} value={self.lenght} label={"Password lenght".to_owned()}/>
             </div>
         }
     }
