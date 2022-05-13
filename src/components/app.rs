@@ -18,7 +18,7 @@ pub enum Msg {
     OnLowerChange(bool),
     OnNumericChange(bool),
     OnSpecialChange(bool),
-    OnLenghtChange(u16),
+    OnLenghtChange(u8),
     OnClick,
 }
 
@@ -28,7 +28,7 @@ pub struct App {
     use_lower: bool,
     use_numeric: bool,
     use_special: bool,
-    lenght: u16,
+    lenght: u8,
 }
 
 impl Component for App {
@@ -68,7 +68,7 @@ impl Component for App {
                     lenght = 4;
                 }
                 browser_util::save_item_to_client_storage(LENGHT_KEY, &lenght.to_string());
-                self.lenght = lenght as u16;
+                self.lenght = lenght;
             }
             Msg::OnClick => {
                 let options = PasswordOptions::new()
@@ -96,7 +96,6 @@ impl Component for App {
 
         let on_click = ctx.link().callback(|_| Msg::OnClick);
 
-
         html! {
             <div class="layout">
                 <div style="grid-column: 2/4; grid-row: 2/3;">
@@ -110,9 +109,9 @@ impl Component for App {
                     <label>{"Password lenght"}</label>
                 </div>
                 <div style={"grid-column: 3/4; grid-row: 7/8;"}>
-                <NumericTextBox value={self.lenght} on_change={on_lenght_change}/>
+                <NumericTextBox value={self.lenght} on_change={on_lenght_change} min_value={4}/>
                 </div>
-                <div style={"grid-column: 2/4; grid-row: 8/9; justify-content: center;"}>
+                <div>
                     <button onclick={on_click}>{"Generate"}</button>
                 </div>
             </div>
@@ -136,12 +135,12 @@ fn read_checked_from_client_storage(key: &str) -> bool {
     }
 }
 
-fn get_lenght_from_client_storage() -> u16 {
+fn get_lenght_from_client_storage() -> u8 {
     let mut value = browser_util::get_item_from_client_storage(LENGHT_KEY)
         .unwrap_or("8".to_owned())
-        .parse::<u16>()
-        .unwrap_or(8 as u16);
-    if value < 4{
+        .parse::<u8>()
+        .unwrap_or(8);
+    if value < 4 {
         value = 4;
     }
     value
