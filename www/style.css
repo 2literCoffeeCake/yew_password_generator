@@ -9,7 +9,7 @@ html {
 .layout {
     display: grid;
     grid-template-columns: 10px 150px 150px;
-    grid-template-rows: 10px 50px repeat(6, 30px) 1fr;
+    grid-template-rows: 10px 50px repeat(7, 30px) 1fr;
 }
 
 .layout>div {
@@ -17,6 +17,46 @@ html {
     align-items: center;
 }
 
-.layout div:nth-child(2n+1){
+.layout>div:nth-child(2n+1) {
     justify-content: center;
+}
+
+.numeric_text_box_wrapper {
+    display: grid;
+    grid-template-rows: 20px;
+    grid-template-columns: minmax(30px, 1fr) 50px minmax(30px, 1fr);
+    border: #1a237e 1px solid;
+    border-radius: 3px;
+    color: #e3f2fd;
+    font-size: x-large;
+}
+
+.numeric_text_box_wrapper__button {
+    background-color: #1565c0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.numeric_text_box_wrapper__button:hover {
+    background-color: #2196f3;
+    cursor: pointer;
+}
+
+.numeric_text_box_wrapper>input::-webkit-outer-spin-button,
+.numeric_text_box_wrapper>input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.numeric_text_box_wrapper>input[type=number]{
+    outline: none;
+    border: none;
+    -moz-appearance: textfield;
+    -webkit-appearance: none;
+    -webkit-appearance: none; 
+    margin: 0; 
+    text-align: center;
+    height: 20px;
+    box-sizing: border-box;
 }

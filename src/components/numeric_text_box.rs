@@ -1,37 +1,66 @@
+use yew::{html, Component, Context, Html};
 use wasm_bindgen::{JsCast, UnwrapThrowExt};
-use web_sys::{Event, HtmlInputElement, InputEvent};
+use web_sys::{Event, HtmlInputElement};
 use yew::prelude::*;
 
 #[derive(Clone, PartialEq, Properties)]
 pub struct NumericTextBoxProps {
-    pub label: String,
     pub value: u16,
-    pub on_change: Callback<f64>,
+    pub on_change: Callback<u16>,
 }
 
-fn get_value_from_input_event(e: InputEvent) -> f64 {
-    let event: Event = e.dyn_into().unwrap_throw();
-    let event_target = event.target().unwrap_throw();
-    let target: HtmlInputElement = event_target.dyn_into().unwrap_throw();
-    target.value_as_number()
+#[derive(Debug, Default)]
+pub struct NumericTextBox;
+
+pub enum Msg{
+    OnValueChange(u16),
+    Increment,
+    Decrement,
 }
 
-#[function_component(NumericTextBoxBox)]
-pub fn render_numeric_text_box(props: &NumericTextBoxProps) -> Html {
-    let NumericTextBoxProps { label, value, on_change } = props.clone();
+impl Component for NumericTextBox{
+    type Message = Msg;
 
-    let oninput = Callback::from(move |input_event: InputEvent| {
-        on_change.emit(get_value_from_input_event(input_event));
-    });
+    type Properties = NumericTextBoxProps;
 
-    html! {
-        <>
-            <div style={"grid-column: 2/3; grid-row: 7/8;"}>
-                <label>{label}</label>
+    fn create(_ctx: &Context<Self>) -> Self {
+        Self
+    }
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let NumericTextBoxProps { mut value, on_change } = ctx.props().clone();
+        value = match msg {
+            Msg::OnValueChange(value) => value,
+            Msg::Increment => value + 1,
+            Msg::Decrement => value -1,
+        };
+        on_change.emit(value);
+        true
+    }
+
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let props = ctx.props();
+
+        let on_decrement_click = ctx.link().callback(|_| Msg::Decrement);
+        let on_increment_click = ctx.link().callback(|_| Msg::Increment);
+
+        let on_input_change = ctx.link().callback(|event: Event|{
+            let event_target = event.target().unwrap_throw();
+            let target: HtmlInputElement = event_target.dyn_into().unwrap_throw();
+            let value = target.value_as_number().floor();
+            Msg::OnValueChange(value as u16)
+        });
+
+        html! {
+            <div class={"numeric_text_box_wrapper"}>
+                <div class={"numeric_text_box_wrapper__button"} onclick={on_decrement_click}>
+                {"-"}
+                </div>
+                <input type="number" value={props.value.to_string()} onchange={on_input_change}/>
+                <div class={"numeric_text_box_wrapper__button"} onclick={on_increment_click}>
+                {"+"}
+                </div>
             </div>
-            <div style={"grid-column: 3/4; grid-row: 7/8;"}>
-                <input type="number" value={value.to_string()} {oninput}/>
-            </div>
-        </>
+        }
     }
 }

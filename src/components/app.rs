@@ -5,7 +5,7 @@ use crate::{
     password_builder::{generate_random_password, PasswordOptions},
 };
 
-use super::{CheckBox, NumericTextBoxBox};
+use super::{CheckBox, NumericTextBox};
 
 static UPPER_CASE_KEY: &str = "upper_value";
 static LOWER_CASE_KEY: &str = "lower_value";
@@ -18,7 +18,7 @@ pub enum Msg {
     OnLowerChange(bool),
     OnNumericChange(bool),
     OnSpecialChange(bool),
-    OnLenghtChange(f64),
+    OnLenghtChange(u16),
     OnClick,
 }
 
@@ -64,9 +64,8 @@ impl Component for App {
                 self.use_special = checked;
             }
             Msg::OnLenghtChange(mut lenght) => {
-                lenght = lenght.floor();
-                if lenght < 4.0 {
-                    lenght = 4.0;
+                if lenght < 4 {
+                    lenght = 4;
                 }
                 browser_util::save_item_to_client_storage(LENGHT_KEY, &lenght.to_string());
                 self.lenght = lenght as u16;
@@ -97,6 +96,7 @@ impl Component for App {
 
         let on_click = ctx.link().callback(|_| Msg::OnClick);
 
+
         html! {
             <div class="layout">
                 <div style="grid-column: 2/4; grid-row: 2/3;">
@@ -106,7 +106,12 @@ impl Component for App {
                 <CheckBox on_change={on_lower_change} checked={self.use_lower} row={4} label={"Use lower case letters".to_owned()}/>
                 <CheckBox on_change={on_numeric_change} checked={self.use_numeric} row={5} label={"Use numeric".to_owned()}/>
                 <CheckBox on_change={on_special_change} checked={self.use_special} row={6} label={"Use special".to_owned()}/>
-                <NumericTextBoxBox on_change={on_lenght_change} value={self.lenght} label={"Password lenght".to_owned()}/>
+                <div style={"grid-column: 2/3; grid-row: 7/8;"}>
+                    <label>{"Password lenght"}</label>
+                </div>
+                <div style={"grid-column: 3/4; grid-row: 7/8;"}>
+                <NumericTextBox value={self.lenght} on_change={on_lenght_change}/>
+                </div>
                 <div style={"grid-column: 2/4; grid-row: 8/9; justify-content: center;"}>
                     <button onclick={on_click}>{"Generate"}</button>
                 </div>
